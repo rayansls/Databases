@@ -1,0 +1,7 @@
+File: module-01/telemetry.db
+Size: XXX MB
+Rows: 172800
+
+Running this in the cloud would cost ~€X/month for two readers. For a local
+dashboard and a weekly shift report, an embedded SQLite file on the shop-floor
+machine is free and requires no administrator.
