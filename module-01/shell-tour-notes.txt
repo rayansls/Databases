@@ -1,0 +1,3 @@
+# sqlite3 shell tour — notes
+
+Most useful dot-command: **.schema** — it prints the exact CREATE statement that built the table, which is the fastest way to understand a database you did not design yourself.

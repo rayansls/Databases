@@ -1,0 +1,8 @@
+reading
+CREATE TABLE reading(machine TEXT, vib REAL);
+╭─────────┬──────╮
+│ machine │ peak │
+╞═════════╪══════╡
+│ cnc-01  │  1.2 │
+│ cnc-02  │  2.4 │
+╰─────────┴──────╯
