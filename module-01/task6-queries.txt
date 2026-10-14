@@ -1,0 +1,1 @@
+Running this in the cloud would cost ~€X/month for two readers — a waste for data that fits on one laptop
