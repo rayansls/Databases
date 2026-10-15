@@ -1,0 +1,12 @@
+COUNT(*) = 172800
+
+machine  avg_load
+-------  --------------------
+cnc-02   60.037889765966803
+cnc-03   60.02894511447024
+cnc-01   60.008048797425872
+
+QUERY PLAN
+|--SCAN readings
+|--USE TEMP B-TREE FOR GROUP BY
+`--USE TEMP B-TREE FOR ORDER BY
