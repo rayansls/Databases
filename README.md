@@ -16,7 +16,7 @@ In my team for the final project, I also had the following members:
 - Jomarie Manuel, [portfolio link](https://github.com/jmanuel08/database-jomportfolio)
 - Sanjay Pachan Maheshwari [portfolio link](https://github.com/yajnas-crpto/databases_portfolio_sanjay/tree/main)
 
-Our team final project repository is [here](https://github.com/somewhere/final-iot-project)
+Our team final project repository is [here](https://github.com/rayansls/Databases)
 
 My personal profile and expectations, you can find [here](Module01/README.md#task-personal-profile).
 
