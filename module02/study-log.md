@@ -67,3 +67,5 @@ erDiagram
 - **Learning we jointly stand behind:** <...>
 - **Open disagreements:** <...>
 - **Image posted in Discord:** <description or file> (why: <one sentence>)
+
+- Aha: Defect 3 — `unit_price < '15'` on TEXT excluded P-1003 (€9.90) because `'9.90' > '15'` as string. The cheapest part vanishes from the report. No error. This is exactly the kind of silent corruption the module warns about.
