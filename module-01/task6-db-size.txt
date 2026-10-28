@@ -1,5 +1,5 @@
 File: module-01/telemetry.db
-Size: XXX MB
+Size: 10 MB
 Rows: 172800
 
 Running this in the cloud would cost ~€X/month for two readers. For a local
