@@ -1,12 +1,3 @@
-# Personal Portfolio for the IoT/MCU class HSBI
->
-> Resources:
-> - A nice markdown cheatsheet: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-> - The beginner's guide to git & github: https://www.freecodecamp.org/news/the-beginners-guide-to-git-github/
-> - Slightly longer git-intro tutorial video: https://youtu.be/8Dd7KRpKeaE
-> - If you want to take a class on git and even potentially get certified:
->   https://education.github.com/experiences/foundations_certificate
-
 Author: Slassi Rayan
 
 My partners are Aron Grudaj [portfolio link](https://github.com/AronGrudaj/Databases-Portfolio) and Jonathan Behring [portfolio link](https://github.com/Jonathan-T-B/databasesclass)
