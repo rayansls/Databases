@@ -12,16 +12,15 @@
 | <EER model> | <https://en.wikipedia.org/wiki/Enhanced_entity%E2%80%93relationship_model> | <Enhanced version of the regular ER Model> |
 
 ### 2. Things I googled
-- **<term/question>**: <how to do a digramm online> ([source](<URL>))
+what is a surrogate key? and a natural key? 
 
 ### 3. Remarkable things
 - <surprise / aha / counterexample>
 
 ### 4. LLM Q&A
-**Prompt:** <exact prompt you used>
-**Answer (summary):** <2-3 lines>
-**How I verified it:** <what query or source you checked it against>
-**Where it was wrong or vague:** <honest note>
+*Prompt:** "Explain the difference between a natural key and a surrogate key, and give one real scenario where choosing the wrong one causes a data bug."
+**Answer (summary):** A natural key is real-world data (email, serial number). A surrogate key is a synthetic ID. Using a natural key as PK is risky if the value can change (e.g. a person's email address). The wrong choice causes update anomalies when the natural key changes.
+**How I verified it:** Ran `SELECT part_no, COUNT(*) FROM part GROUP BY part_no HAVING COUNT(*) > 1;` on `legacy.db`. Confirmed `P-1003` is duplicated because `part_no` has no UNIQUE. This proves the LLM's claim: "without a UNIQUE constraint, a natural key is not actually a key."
 
 ### 5. My best ER sketches
 **Sketch 1**
@@ -63,9 +62,18 @@ erDiagram
 ---
 
 ## Task C: Agreed learning (pod discussion)
-- **Shared points (3-5):** <...>
-- **Learning we jointly stand behind:** <...>
-- **Open disagreements:** <...>
+## Working with another Task Pod
+
+- ERD: Multiple Attributes stored in datacells. When they are connected together, they create a database.
+- Cardinality: the relationship between different attributes (1:1, 1:m, etc)
+- EER: ERD, with sub-Topics (sub-attributes). It introduces Inheritance.
+- Natural key: a related real-world tangible ID 
+- surrogated key is snd invented key that is generated in the database and is unrelated to the real world.
+- Foreign key: a key to access foreign databases. It creates a link between 2 databases.
+- 1NF: Every value Needs its own place. One cell cannot hold multiple values.  
+- The code side: needed to access data from databases. we can SELECT, INSERT INTO, DELETE, etc.
+- <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/eaf50f23-a666-4dc8-a654-1f32fbdebef4" />
+
 - **Image posted in Discord:** <description or file> (why: <one sentence>)
 
 - Aha: Defect 3 — `unit_price < '15'` on TEXT excluded P-1003 (€9.90) because `'9.90' > '15'` as string. The cheapest part vanishes from the report. No error. This is exactly the kind of silent corruption the module warns about.
