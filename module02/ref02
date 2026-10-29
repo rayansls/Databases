@@ -22,3 +22,4 @@ Before this module, I thought a column called `part_no` or `machine_name` was au
 ## What I'd still like to understand
 
 EER inheritance: when is one table with a `type` column better than separate tables joined by a key? And how to fully synchronize Pydantic with SQLAlchemy without writing the same rule twice (once in Python, once in the DB).
+I would like to explore the EER (Enhanced Entity-Relationship) inheritance more deeply. Specifically: when is it better to use one table with a `type` column (e.g. `Device` with `type = 'sensor'` or `'printer'`), and when is it better to use separate tables (`Sensor`, `Printer`) joined by a key? The module mentions both, but I haven't yet built a real example to see the trade-offs. I would also like to understand how Pydantic and SQLAlchemy can be fully synchronized to avoid writing the same rule twice (once in Python, once in the database).
