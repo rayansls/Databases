@@ -46,7 +46,7 @@ o   Copied every row from the CSV into the table
 o   I learned that inserting data into SQLite by concatenating strings is dangerous; it allows SQL injection. The safe way is to use bound parameters: ? placeholders with values passed separately, so the database always treats them as data, never as code. I proved this with a demo that shows a malicious input destroying a table in the unsafe version but being stored literally in the safe version."
 
 Take a first LLM-generated query, run it, and begin the habit that defines this course: verify before you trust.
-I asked an LLM for a query on my readings table. It worked, but when I tried to break it I found that it used LIKE '%18%' for the time filter, which matches any '18' anywhere in the timestamp, not just the hour 18:00. I corrected it to ts > '2026-01-05 18:00:00', compared the results, and confirmed the difference 
+- I asked an LLM for a query on my readings table. It worked, but when I tried to break it I found that it used LIKE '%18%' for the time filter, which matches any '18' anywhere in the timestamp, not just the hour 18:00. I corrected it to ts > '2026-01-05 18:00:00', compared the results, and confirmed the difference 
 
 
 ## Reflection 1
