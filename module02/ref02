@@ -1,0 +1,21 @@
+# Module 02 — Reflection
+
+## What I thought I knew at the start
+
+Before starting this module, I thought that if a column had a name like `part_no` or `machine_name`, it was automatically a key. I also thought that SQLite (and databases in general) would naturally prevent you from inserting a record that pointed to a non-existent machine. I assumed the database would "protect itself" from bad data.
+
+## What turned out wrong or incomplete
+
+Three things turned out to be wrong:
+
+1. **A natural key without UNIQUE is not a key.** The `part` table had a column called `part_no`, but no UNIQUE constraint. As a result, the seed data already contained a duplicate (`P-1003`). The database didn't complain because it didn't "know" the column was supposed to be unique.
+2. **A JOIN can succeed and still be wrong.** In Defect 5, joining `maint_job` with `part` on `parts_used` returned only 2 rows. The multi-part jobs silently disappeared. There was no error. This was the most shocking discovery: a silent wrong answer is worse than an error message.
+3. **SQLite accepts Foreign Keys but doesn't enforce them by default.** I learned that the legacy schema had no real constraints, and even if it had written `REFERENCES machine(id)`, SQLite would have ignored it unless `PRAGMA foreign_keys = ON` was set. That's why the orphan job `cnc-05` existed.
+
+## The one habit I'll carry forward
+
+**Verify with a query, not with intuition.** The module insisted on "proving defects with queries, not by describing them", and I now understand why. Before this module, I would have looked at `parts_used = 'P-1001,P-1002'` and thought "looks fine". Now I know I need to run `SELECT ... JOIN ...` and count the rows to see if anything disappears. This habit applies to everything, not just databases.
+
+## What I'd still like to understand
+
+I would like to explore the EER (Enhanced Entity-Relationship) inheritance more deeply. Specifically: when is it better to use one table with a `type` column (e.g. `Device` with `type = 'sensor'` or `'printer'`), and when is it better to use separate tables (`Sensor`, `Printer`) joined by a key? The module mentions both, but I haven't yet built a real example to see the trade-offs. I would also like to understand how Pydantic and SQLAlchemy can be fully synchronized to avoid writing the same rule twice (once in Python, once in the database).
