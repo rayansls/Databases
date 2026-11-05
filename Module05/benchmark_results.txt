@@ -1,0 +1,6 @@
+=== ROUND 4: BENCHMARK ===
+
+Query A (Normalized 3NF): 0.860 seconds
+Query B (Denormalized Report): 0.934 seconds
+
+Finding: On 200,000 rows, the 3NF tables were just as fast (or slightly faster) than the denormalized table. The overhead of reading a wider, fatter table cancels out the speed gained by avoiding JOINs.
