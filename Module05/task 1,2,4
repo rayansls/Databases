@@ -1,1 +1,10 @@
-During class with my new pod I did the task 1 2 and 4 which you can find in my teammates portfolios
+During class I worked with a new pod: Isa Babayev, Arshia Ziaee and Asmin Metin.
+
+We did the first two rounds (the functional dependencies and the anomalies) together in our pod document: Isa wrote down the dependencies, Asmin and Arshia drew the two ER sketches, and I asked an LLM for its list of dependencies and compared it with ours. Isa ran the "price it" round.
+
+Their portfolios:
+- Isa Babayev: https://github.com/isa-babayev-ibabayev/databases-portfolio
+- Arshia Ziaee: https://github.com/Arshia-zi
+- Asmin Metin: https://github.com/asminmetin/databases-portfolio
+
+My own parts (building the tables and the race) are in this folder and explained in README.md.

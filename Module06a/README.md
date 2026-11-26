@@ -1,16 +1,16 @@
-# Module 6a  The Analytical Engine (DuckDB)
+# Module 6a — The Analytical Engine (DuckDB)
 
 [← Module 5](../Module05/README.md) · [Back to my portfolio](../README.md) · [Reflection 6](../Reflections/ref06.md) · [Next: Module 6b →](../Module06b/README.md)
 
-In Module 5 I built a reporting table to make the dashboard faster, but it was still inside SQLite, an engine designed to write and read *single rows* very quickly, like recording one maintenance job or looking up one part. A month-end report is a completely different kind of work: it reads millions of rows and squeezes them into a few totals. In this module I stretched the Module 5 report to ten quarters, 2,000,000 rows, moved it into a format built for analysis, and raced SQLite against DuckDB, an engine that stores data by column instead of by row. The goal was not to find "the best database" but to find out, with numbers, which engine fits which job. My notes are in [`duckdb-notes.md`](duckdb-notes.md).
+In Module 5 I built a reporting table to make the dashboard faster, and it hardly helped, because it was still inside SQLite, an engine designed to write and read *single rows* very quickly, like recording one maintenance job or looking up one part. A month-end report is a completely different kind of work: it reads millions of rows and squeezes them into a few totals. In this module I stretched the Module 5 report to ten quarters, 2,000,000 rows, moved it into a format built for analysis, and raced SQLite against DuckDB, an engine that stores data by column instead of by row. The goal was not to find "the best database" but to find out, with numbers, which engine fits which job. My notes are in [`duckdb-notes.md`](duckdb-notes.md).
 
 ## Learning goals
 
 1. Move a table out of SQLite into **Parquet** reproducibly, from a script. [evidence 1](#1-from-sqlite-to-parquet-with-a-script)
-2. Run the **same aggregate** in SQLite and DuckDB and report the difference honestly (interleaved runs, median).
-3. Read **`EXPLAIN ANALYZE`** and name the operator and row count that dominate.
-4. State, with a number, **where DuckDB is the wrong engine**.
-5. Recommend **what moves to the analytical copy** and how that copy stays fresh.
+2. Run the **same aggregate** in SQLite and DuckDB and report the difference honestly (interleaved runs, median). [evidence 2](#2-the-race-reported-honestly)
+3. Read **`EXPLAIN ANALYZE`** and name the operator and row count that dominate. [evidence 3](#3-reading-explain-analyze)
+4. State, with a number, **where DuckDB is the wrong engine**. [evidence 4](#4-where-duckdb-is-the-wrong-engine)
+5. Recommend **what moves to the analytical copy** and how that copy stays fresh. [evidence 5](#5-what-moves-to-the-analytical-copy-and-how-it-stays-fresh)
 
 ---
 
@@ -38,6 +38,8 @@ Before comparing anything, I wanted to be sure that both sides contain the same 
 
 I report the median instead of my best run because a single lucky run proves nothing, as I already saw in Module 3, when two identical runs gave me different times.
 
+What surprised me is that the monthly report gains much more than the dashboard, while the example in the module showed the opposite. My explanation: the dashboard has a `WHERE done_on = ...`, so SQLite throws most rows away early and only has to group a few. The monthly report has to compute the month and group every one of the 2,000,000 rows, one row at a time, and that is exactly the kind of work DuckDB does on whole columns at once.
+
 
 ## 3. Reading `EXPLAIN ANALYZE`
 
@@ -51,14 +53,14 @@ SQLite, on the other hand, shows a `SCAN` over the full rows and a `USE TEMP B-T
 
 ## 4. Where DuckDB is the wrong engine
 
-After seeing DuckDB win so clearly, I tested the opposite kind of work: many small single-row inserts, the kind of work an operational database does all day ([`boundary.py`](boundary.py), [`boundary_batched.py`](boundary_batched.py), [`boundary-results.txt`](boundary-results.txt)):
+After seeing DuckDB win so clearly, I tested the opposite kind of work: many small inserts of one row each, the kind of work an operational database does all day ([`boundary_batched.py`](boundary_batched.py), [`boundary-results.txt`](boundary-results.txt)). In SQLite the script sends 1,000 `INSERT` statements, one row each, inside one transaction; in DuckDB it hands all 1,000 rows to a single `executemany` call, which still inserts them one row at a time:
 
-| 1,000 single-row inserts | Time |
+| 1,000 inserts, one row per statement | Time |
 |---|---:|
 | SQLite | **1.8 ms** |
-| DuckDB | **3,947.0 ms** |
+| DuckDB (`executemany`) | **3,947.0 ms** |
 
-Here DuckDB is roughly two thousand times slower. Batching the inserts helps DuckDB, but it does not close the gap. That is my number for where DuckDB is the wrong engine: writing one row at a time is OLTP work (transactions), not OLAP work (analysis), and an engine optimized for scanning whole columns pays a heavy price for every single small write.
+Here DuckDB is roughly two thousand times slower, even though all the rows were given to it in one call. That is my number for where DuckDB is the wrong engine: writing one row at a time is OLTP work (transactions), not OLAP work (analysis), and an engine optimized for scanning whole columns pays a heavy price for every single small write.
 
 
 ## 5. What moves to the analytical copy, and how it stays fresh

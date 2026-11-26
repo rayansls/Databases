@@ -6,11 +6,11 @@ In Module 3 I checked whether the queries I received were right. In this module 
 
 ## Learning goals
 
-1. Create tables with the full constraint toolkit: `NOT NULL`, `UNIQUE`, `CHECK`, `PRIMARY KEY`, `FOREIGN KEY`, and `STRICT` typing.
-2. Use **generated columns** to derive values at the engine instead of in application code.
-3. Write **triggers** that enforce domain rules and maintain audit/rollup tables automatically.
-4. Use **DML** correctly — including `UPSERT` (`ON CONFLICT`) for idempotent edge ingestion.
-5. Reason about **access control (DCL)**: who may read or write, and how that maps from server `GRANT`s to an embedded, local-first world.
+1. Create tables with the full constraint toolkit: `NOT NULL`, `UNIQUE`, `CHECK`, `PRIMARY KEY`, `FOREIGN KEY`, and `STRICT` typing. [evidence 1](#1-the-constraint-toolkit-and-seeing-each-rule-say-no)
+2. Use **generated columns** to derive values at the engine instead of in application code. [evidence 2](#2-generated-columns)
+3. Write **triggers** that enforce domain rules and maintain audit/rollup tables automatically. [evidence 3](#3-triggers-for-alarms-and-audit)
+4. Use **DML** correctly — including `UPSERT` (`ON CONFLICT`) for idempotent edge ingestion. [evidence 4](#4-upsert-ingesting-the-same-data-twice-without-duplicates)
+5. Reason about **access control (DCL)**: who may read or write, and how that maps from server `GRANT`s to an embedded, local-first world. [evidence 5](#5-access-control-without-a-server)
 
 ---
 
@@ -54,7 +54,7 @@ I created a unique index on `(sensor_id, ts)`, so that one sensor can have only 
 
 A server database like PostgreSQL manages access centrally, with users and roles (`CREATE ROLE`, `GRANT SELECT ON machine_health TO reports_user`). SQLite has none of that: there are no users and no roles, so access control moves to the operating system (who is allowed to read or write the file) and to views (which expose only a safe part of the data).
 
-My conclusion is that file permissions are perfectly fine at the edge, because it is a single box, physically secured, with one user, so the operating system is the only boundary needed. They are not acceptable for a web app with many customers, because one SQLite file cannot tell customer A from customer B: everyone with access to the file sees everything. That situation needs a server with separate roles and row-level security.
+My conclusion is that file permissions are perfectly fine at the edge, because it is a single box, physically secured, with one user, so the operating system is the only boundary needed. They are not acceptable for a web app with many customers, because one SQLite file cannot tell customer A from customer B: everyone with access to the file sees everything. That situation needs a server with separate roles and row-level security. My original notes on this are in [Task 4 of `integrity-notes.md`](integrity-notes.md#task-4---access-control-reflection).
 
 
 ---

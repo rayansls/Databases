@@ -1,4 +1,4 @@
-# Re# Reflection 5 — Module 5: Normalization vs. Denormalization
+# Reflection 5 — Module 5: Normalization vs. Denormalization
 
 [← Reflection 4](ref04.md) · [Module 5 README](../Module05/README.md) · [Next: Reflection 6 →](ref06.md)
 
@@ -30,4 +30,10 @@ The bigger surprise was that our denormalized dashboard was not faster at all: i
 
 - How was your interaction with peers/instructors?
 
-During class, I worked with my new pod: Isa Babayev ([portfolio](https://github.com/isa-babayev-ibabayev/databases-portfolio)), Arshia Ziaee ([GitHub](https://github.com/Arshia-zi)) and Asmin Metin ([portfolio](https://github.com/asminmetin/databases-portfolio)). We worked through the functional dependencies and the anomalies together; Isa wrote down the dependencies,
+During class, I worked with my new pod: Isa Babayev ([portfolio](https://github.com/isa-babayev-ibabayev/databases-portfolio)), Arshia Ziaee ([GitHub](https://github.com/Arshia-zi)) and Asmin Metin ([portfolio](https://github.com/asminmetin/databases-portfolio)). We worked through the functional dependencies and the anomalies together; Isa wrote down the dependencies, Asmin and Arshia drew the two ER sketches, and Isa ran the price-it round. That part of the work is in my teammates' portfolios.
+
+After class I talked with the professor about our results, because my denormalized version was actually slower than the normalized one, which is the opposite of what we expected.
+
+- Who did you help, gave feedback to?
+
+In the pod I took care of asking an LLM for its list of functional dependencies and comparing it with ours, and I built the normalized tables and the race; these parts are in my portfolio ([Module 5](../Module05/README.md)).

@@ -1,8 +1,8 @@
-﻿=== Boundary Tests ===
-(Single-row inserts/lookups from boundary.py)
-...
+﻿=== Boundary test (boundary_batched.py) ===
+1,000 inserts of one row each
+- SQLite: 1,000 INSERT statements inside one transaction
+- DuckDB: all 1,000 rows passed to one executemany call
 
-=== Batched ===
 Starting boundary test...
 SQLite inserts: 1.8 ms
 DuckDB batched inserts: 3947.0 ms

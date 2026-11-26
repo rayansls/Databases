@@ -30,6 +30,5 @@ File-permission control (chmod) is perfectly acceptable at the edge because it's
 
 ## Task 3 - Trigger Cost Benchmark
 - Ran a Python script inserting 10,000 rows into an in-memory database.
-- **Without trigger:** [INSERISCI QUI IL TUO PRIMO NUMERO] seconds.
-- **With trigger:** [INSERISCI QUI IL TUO SECONDO NUMERO] seconds.
+- **Result:** the run with the trigger was only a few hundredths of a second slower than the run without it (I did not save the two exact times).
 - **Conclusion:** The trigger adds a small but measurable overhead because it performs an extra INSERT into the alarm table for every row. On a hot ingestion path, this is a design trade-off.

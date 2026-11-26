@@ -2,17 +2,17 @@
 
 [← Module 6a](../Module06a/README.md) · [Back to my portfolio](../README.md) · [Reflection 7](../Reflections/ref07.md)
 
-In Module 6a I learned that one engine can be perfect for one job and terrible for another: DuckDB was almost 13 times faster for the month-end report and about two thousand times slower for small single-row writes. This module takes that idea to the whole plant. Kortmann has four different workloads: the machines constantly append new readings, the month-end report reads two years of history, the vendor metadata keeps growing new fields, and the dashboard needs to remember who logged in and which filter they used last. One engine *could* serve all four, but not equally well. So the goal of this module was not to learn as many engines as possible, but to make a decision for each workload, write it down on one page, and defend it with numbers I actually produced.
+In Module 6a I learned that one engine can be perfect for one job and terrible for another: DuckDB was almost 13 times faster for the dashboard and 44 times faster for the monthly report, but about two thousand times slower for small one-row inserts. This module takes that idea to the whole plant. Kortmann has four different workloads: the machines constantly append new readings, the month-end report reads two years of history, the vendor metadata keeps growing new fields, and the dashboard needs to remember who logged in and which filter they used last. One engine *could* serve all four, but not equally well. So the goal of this module was not to learn as many engines as possible, but to make a decision for each workload, write it down on one page, and defend it with numbers I actually produced.
 
 ## Learning goals
 
-1. Store **semi-structured data (JSON)** in SQLite and query it with `json_extract`/`json_each` and an **expression index**.
-2. Implement and evaluate a **key-value access pattern** against SQLite.
-3. Explain **ACID vs. BASE** and the **CAP theorem** in terms of the systems you actually ran.
-4. Choose an engine per workload and **defend the choice with a measurement**.
-5. Say what changes — and what gets harder — when the same data lives on a **server**.
+1. Store **semi-structured data (JSON)** in SQLite and query it with `json_extract`/`json_each` and an **expression index**. [evidence 1](#1-vendor-metadata-as-json-and-the-index-that-disappears)
+2. Implement and evaluate a **key-value access pattern** against SQLite. [evidence 2](#2-dashboard-sessions-key-value-or-sqlite)
+3. Explain **ACID vs. BASE** and the **CAP theorem** in terms of the systems you actually ran. [evidence 3](#3-acid-base-and-cap-in-the-systems-i-actually-ran)
+4. Choose an engine per workload and **defend the choice with a measurement**. [evidence 4](#4-the-decision-record)
+5. Say what changes — and what gets harder — when the same data lives on a **server**. [evidence 5](#5-what-changes-when-the-data-lives-on-a-server)
 
-My evidence for this module: [`json_bench.py`](json_bench.py) (Task 2), [`kv_compare.py`](kv_compare.py) (the key-value homework), [`two_writers.py`](two_writers.py) (the SQLite version of Task 1), the [decision record](#4-the-decision-record) below, and the [project ticket](project-ticket.md).
+My evidence for this module: [`json_bench.py`](json_bench.py) (Task 2), [`kv_compare.py`](kv_compare.py) and [`kv-results.txt`](kv-results.txt) (the key-value homework), [`two_writers.py`](two_writers.py) (the SQLite version of Task 1), the [decision record](#4-the-decision-record) below, and the [project ticket](project-ticket.md).
 
 ---
 
@@ -43,14 +43,17 @@ To answer it I ran [`kv_compare.py`](kv_compare.py), which stores and reads back
 
 | 20,000 sessions | write | read |
 |---|---:|---:|
-| `shelve` (key-value) | ~3.5 s | ~0.1 s |
-| SQLite (`session` table) | ~0.03 s | ~0.07 s |
+| `shelve` (key-value) | 14.290 s | 0.218 s |
+| SQLite (`session` table) | 0.059 s | 1.675 s |
 
-[TODO: re-run `uv run python Module06b/kv_compare.py` on my laptop and replace these numbers with my own. `shelve` uses a different backend on every platform, so the module asks for orders of magnitude, not decimals.]
+These are my own numbers, from a run on my Windows laptop started from VS Code ([`kv-results.txt`](kv-results.txt)). Since `shelve` uses a different backend on every platform, the module asks to compare orders of magnitude, not decimals:
 
-Reading is in the same order of magnitude in both, a few microseconds per session. Writing is where they differ, and on this run SQLite was about a hundred times faster, because `executemany` writes all 20,000 sessions in a single transaction, while `shelve` stores them one by one. So the key-value store did not win even on the one job it was designed for.
+- **Writing:** about 10 seconds for `shelve` against about 0.1 seconds for SQLite, so SQLite is more than two orders of magnitude faster (about 240×). The reason is that `executemany` writes all 20,000 sessions in one single transaction, while `shelve` stores them one by one.
+- **Reading:** here the key-value store wins: about 0.2 seconds for `shelve` against about 2 seconds for SQLite, so `shelve` is almost eight times faster, close to one order of magnitude. A key-value lookup is just "give me the value for this key", while SQLite has to run a small SQL statement for every single lookup.
 
-And there is one thing SQLite can do that `shelve` simply cannot: ask a question across all sessions. With one `GROUP BY` I could count how many sessions used each city filter (5,000 each). With `shelve` I can only fetch one key at a time, so I would have to read every single session and count them myself in Python. For this reason I would ship the dashboard sessions as a small key-value table *inside* SQLite: it is as simple as a key-value store, and it keeps the possibility to ask questions later.
+So each one wins at one thing. But even SQLite's slower read is only about 0.08 ms per session, which nobody will notice when opening a dashboard, while a write that takes 14 seconds for 20,000 sessions is a real cost.
+
+And there is one thing SQLite can do that `shelve` simply cannot: ask a question across all sessions. With one `GROUP BY` I could count how many sessions used each city filter (5,000 each). With `shelve` I can only fetch one key at a time, so I would have to read every single session and count them myself in Python. For these reasons I would ship the dashboard sessions as a small key-value table *inside* SQLite: I accept slower reads that are still far below anything a user can notice, and in exchange I get much faster writes and the possibility to ask questions about the sessions later.
 
 ## 3. ACID, BASE and CAP, in the systems I actually ran
 
@@ -69,9 +72,9 @@ This is the one-page decision for Kortmann. Every row is based on a measurement 
 | Workload | Engine | Why | Evidence | Cost accepted | What breaks if stale/missing? |
 |---|---|---|---|---|---|
 | Month-end report over two years | Parquet + DuckDB | A 2M-row aggregate is much faster in a column engine, and the operational SQLite stays free for writing | [Module 6a](../Module06a/README.md): dashboard 280.7 ms → 21.8 ms (12.9×), monthly report 2,287 ms → 52 ms (44×); Parquet file 2.4 MB; row count and sums match | A nightly export and up to one day of staleness | Rebuild the Parquet file; the report shows the last complete day |
-| Sensor/job ingest, every 30 s, a crash must not lose rows | SQLite | Embedded and ACID: a committed row survives a crash, and constraints refuse garbage at the edge | [Module 4](../module04/README.md): `ingest.py` run twice → still 4 rows (idempotent UPSERT); NOT NULL, CHECK and FOREIGN KEY reject bad rows; [Module 6a](../Module06a/README.md): 1,000 single-row inserts in 1.8 ms (DuckDB: 3,947 ms) | One writer at a time; foreign keys must be switched on in every connection | Missing rows mean missing alarms; a device that resends data creates no duplicates |
+| Sensor/job ingest, every 30 s, a crash must not lose rows | SQLite | Embedded and ACID: a committed row survives a crash, and constraints refuse garbage at the edge | [Module 4](../module04/README.md): `ingest.py` run twice → still 4 rows (idempotent UPSERT); NOT NULL, CHECK and FOREIGN KEY reject bad rows; [Module 6a](../Module06a/README.md): 1,000 one-row inserts in 1.8 ms (DuckDB: 3,947 ms) | One writer at a time; foreign keys must be switched on in every connection | Missing rows mean missing alarms; a device that resends data creates no duplicates |
 | Vendor metadata that gains fields | SQLite with a JSON column | New vendor fields need no migration, while the machine row and its joins stay relational | [`json_bench.py`](json_bench.py): `json_valid` rejects non-JSON; the expression index gives `SEARCH ... USING INDEX`, the `->>` version gives `SCAN` | No column types inside the JSON; queries must use exactly the indexed expression | An unknown field is simply stored; a missing field returns NULL, so a missing calibration date has to be checked on purpose |
-| Dashboard session state | SQLite key-value table (`k TEXT PRIMARY KEY, v TEXT`) | It is a lookup by one key, and SQLite is as fast as `shelve` for reading and much faster for writing, while still allowing queries across sessions | [`kv_compare.py`](kv_compare.py): reads ~0.1 s for 20,000 sessions in both; writes ~0.03 s (SQLite) vs ~3.5 s (`shelve`) [TODO: my laptop numbers] | Slightly more setup than a dictionary | Users lose their last filter and have to log in again; no business data is lost |
+| Dashboard session state | SQLite key-value table (`k TEXT PRIMARY KEY, v TEXT`) | It is a lookup by one key; SQLite writes about 240× faster than `shelve` and still allows queries across sessions | [`kv_compare.py`](kv_compare.py) on my laptop, 20,000 sessions: writes 0.059 s (SQLite) vs 14.3 s (`shelve`); reads 1.7 s (SQLite) vs 0.22 s (`shelve`) | Reads about 8× slower than `shelve` (still ~0.08 ms per session) | Users lose their last filter and have to log in again; no business data is lost |
 | *(optional)* Concurrent users on the network | PostgreSQL server, only if many people must write at the same time from different machines | SQLite allows one writer at a time on one file; a server handles many connections | [`two_writers.py`](two_writers.py): the second writer gets `database is locked`; my observations in section 5 | Credentials, network, operations, and a single point of failure | If the server is down, every client fails at once |
 
 **If Kortmann could run only one engine, it would be SQLite.** It handles three of the four workloads well (ingest, vendor metadata and sessions), it needs no server, and it is ACID on the machine where the data is created. What would break first is the month-end report: in Module 6a SQLite needed 280.7 ms for the dashboard and about 2.3 seconds for the monthly report on 2,000,000 rows, where DuckDB needed 22 ms and 52 ms, and that gap grows with every month of history. The report would not become wrong, it would become slow, and while it runs it competes with the writer for the same file.
@@ -85,7 +88,7 @@ Since I was not in class, I could not swap records with another pod, so I asked 
 - **What breaks if two people write at the same time?** With SQLite, the second writer waits or gets `database is locked`; nothing is lost, but writes happen one after the other. If the plant ever has many writers on the network, that is the row where I would switch to a server.
 - **Why is this a database and not three spreadsheets?** Because the database refuses bad data (constraints, `json_valid`), lets me ask questions across all the rows (how many devices are not calibrated, how many sessions use each filter) and keeps a committed row safe after a crash.
 
-The row I would change after this exercise is the session-state row: at first I expected a key-value store to be the natural choice, but my own benchmark showed that a key-value table inside SQLite is just as good, so I moved it to SQLite.
+The row I would change after this exercise is the session-state row: at first I expected a key-value store to be the natural choice, and my benchmark did show that `shelve` reads faster, but it writes so much more slowly, and it cannot answer a single question across sessions, that I moved the row to SQLite.
 
 ## 5. What changes when the data lives on a server
 

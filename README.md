@@ -7,9 +7,9 @@ In my team for the final project, I also had the following members:
 - Jomarie Manuel, [portfolio link](https://github.com/jmanuel08/database-jomportfolio)
 - Sanjay Pachan Maheshwari, [portfolio link](https://github.com/yajnas-crpto/databases_portfolio_sanjay/tree/main)
 
-Our team final project repository is [here](https://github.com/rayansls/Databases) <!-- TODO: this link points to this portfolio; replace it with the team project repository -->
+Our team's final project is MACHINEX, a machine-health and maintenance-intelligence system for the fictional company RICE & SHINE; its starting point is in my [project ticket](Module06b/project-ticket.md).
 
-My personal profile and expectations, you can find [here](module-01/README.md). <!-- TODO: add a "Personal profile" section to the Module 1 README -->
+My personal profile and expectations, you can find [here](module-01/README.md#my-personal-profile-and-expectations).
 
 ## Table of Contents
 

@@ -6,11 +6,11 @@ In Module 2 I learned to read a database I did not build. In this module I start
 
 ## Learning goals
 
-1. Build complex **DQL** queries: joins, aggregation with `GROUP BY`/`HAVING`, subqueries, and window functions.
-2. Read **`EXPLAIN QUERY PLAN`** as primary evidence: say what the engine will do for a given query, tell a `SCAN` from a `SEARCH`, and a table lookup from a covering index.
-3. **Benchmark** the effect of an index and explain when the planner ignores one.
-4. Generate a query with an **LLM**, then **verify** it: correctness, performance, and edge cases.
-5. **Prevent SQL injection** with bound parameters and demonstrate why string concatenation is exploitable.
+1. Build complex **DQL** queries: joins, aggregation with `GROUP BY`/`HAVING`, subqueries, and window functions. [evidence 1](#1-building-complex-queries)
+2. Read **`EXPLAIN QUERY PLAN`** as primary evidence: say what the engine will do for a given query, tell a `SCAN` from a `SEARCH`, and a table lookup from a covering index. [evidence 2](#2-reading-the-query-plan)
+3. **Benchmark** the effect of an index and explain when the planner ignores one. [evidence 3](#3-benchmarking-an-index-and-when-it-does-not-help)
+4. Generate a query with an **LLM**, then **verify** it: correctness, performance, and edge cases. [evidence 4](#4-verifying-the-llms-query)
+5. **Prevent SQL injection** with bound parameters and demonstrate why string concatenation is exploitable. [evidence 5](#5-sql-injection-and-bound-parameters)
 
 ---
 

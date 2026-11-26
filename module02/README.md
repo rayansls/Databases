@@ -6,11 +6,11 @@ In Module 1 I built a small database myself, so I knew exactly what every column
 
 ## Learning goals
 
-1. Reconstruct an **ER/EER model** (entities, attributes, keys, relationships, cardinalities) from an undocumented SQL schema.
-2. Identify **integrity defects** — missing foreign keys, orphan rows, redundant data, normalization violations — with queries, not intuition.
-3. Distinguish an **entity relationship** from an attribute, and a **surrogate key** from a natural key, and justify the choice.
-4. Express a schema as a **code-first data contract** (Pydantic / SQLAlchemy) that an application can enforce.
-5. Write the **requirements the schema forgot**: the business rules nobody encoded.
+1. Reconstruct an **ER/EER model** (entities, attributes, keys, relationships, cardinalities) from an undocumented SQL schema. [evidence 1](#1-reconstructing-the-er-model)
+2. Identify **integrity defects** — missing foreign keys, orphan rows, redundant data, normalization violations — with queries, not intuition. [evidence 2](#2-proving-the-integrity-defects-with-queries)
+3. Distinguish an **entity relationship** from an attribute, and a **surrogate key** from a natural key, and justify the choice. [evidence 3](#3-entity-or-attribute-natural-or-surrogate-key)
+4. Express a schema as a **code-first data contract** (Pydantic / SQLAlchemy) that an application can enforce. [evidence 4](#4-the-data-contract-in-code)
+5. Write the **requirements the schema forgot**: the business rules nobody encoded. [evidence 5](#5-the-requirements-the-schema-forgot)
 
 My evidence for this module: [`setup.sql`](setup.sql) (rebuilds `legacy.db`), [`er-audit.md`](er-audit.md) (the full audit), [`contract.py`](contract.py) and [`corrected-schema.sql`](corrected-schema.sql) (the contract), and [`study-log.md`](study-log.md) (the pod study).
 
@@ -18,7 +18,7 @@ My evidence for this module: [`setup.sql`](setup.sql) (rebuilds `legacy.db`), [`
 
 ## Before the lab: studying in the pod
 
-Since everything in this module was new to me, I started with the theory together with my pod. I read the basic pages on the [ER model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model) and on the [enhanced ER model](https://en.wikipedia.org/wiki/Enhanced_entity%E2%80%93relationship_model), and the first thing I had to google was simply: what is a surrogate key, and what is a natural key? I then asked an LLM to explain the difference and to give me a real case where the wrong choice causes a bug, and instead of just believing the answer, I checked it against the legacy database (more on that below). Everything is collected in my [study log](study-log.md), including the points we agreed on with another pod in Task C.
+Since everything in this module was new to me, I started with the theory together with my pod. I read the basic pages on the [ER model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model) and on the [enhanced ER model](https://en.wikipedia.org/wiki/Enhanced_entity%E2%80%93relationship_model), and the first thing I had to google was simply: what is a surrogate key, and what is a natural key? I then asked an LLM to explain the difference and to give me a real case where the wrong choice causes a bug, and instead of just believing the answer, I checked it against the legacy database (more on that below). Everything is collected in my [study log](study-log.md), including my [four sketches from words to diagrams](study-log.md#task-b-from-words-to-sketch) (1:1, 1:n, m:n, and entity vs. relationship) with a `CREATE TABLE` + `COUNT` proof, and the points we agreed on with another pod in Task C.
 
 ## 1. Reconstructing the ER model
 
@@ -56,11 +56,9 @@ The module insisted that I should not *describe* defects but *prove* them, and t
 | 2. Duplicate natural key | `P-1003` appears twice | Every sum or count over parts counts it twice, with no error |
 | 3. Price stored as text | `unit_price < '15'` returns only `P-1001` | The cheapest part (9.90) disappears, because as text `'9.90'` comes after `'15'`; invoices and price reports are wrong |
 | 4. Dates that are not dates | `RANDOM-NAME` was "installed" on `'unknown'` | Any filter or age calculation on dates breaks or skips this machine |
-| 5. Joining on the list | The JOIN on `parts_used` matches only the single-part jobs | Job 1, with two parts, silently vanishes from the result |
+| 5. Joining on the list | The JOIN on `parts_used` returns only jobs 2 and 3, and job 2 even twice | Job 1 (two parts) and job 4 (no parts) silently vanish, and the duplicated `P-1003` counts job 2 double |
 
-Defect 3 was my favourite moment of the module, because I expected three parts and got one, and it took me a while to understand that the database was comparing characters, not numbers. Defect 5, on the other hand, was the most worrying: the query did not crash, it just returned fewer rows. That is the main lesson of this goal for me: a silent wrong answer is worse than an error, and only a query can show it.
-
-[TODO: add the Defect 5 query and its saved result to [`er-audit.md`](er-audit.md), like the other four.]
+Defect 3 was my favourite moment of the module, because I expected three parts and got one, and it took me a while to understand that the database was comparing characters, not numbers. Defect 5, on the other hand, was the most worrying: the query did not crash, it just returned fewer rows. That is the main lesson of this goal for me: a silent wrong answer is worse than an error, and only a query can show it. It also showed me that defects do not stay alone: the duplicate part from Defect 2 made job 2 appear twice in the Defect 5 join.
 
 ## 3. Entity or attribute? Natural or surrogate key?
 

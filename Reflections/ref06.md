@@ -1,7 +1,5 @@
 # Reflection 6 — Module 6a: The Analytical Engine (DuckDB)
 
-<!-- DRAFT written from my Module 6a notes (duckdb-notes.md, race-results.txt, memo.md). Check every sentence and fill in the [TODO] parts before the checkpoint. -->
-
 [← Reflection 5](ref05.md) · [Module 6a README](../Module06a/README.md) · [Next: Reflection 7 →](ref07.md)
 
 - What is your take-away, what do you want to remember, what would be your advice?
@@ -19,14 +17,18 @@ The `EXPLAIN ANALYZE` output was good because it showed me why DuckDB is fast: i
 
 - What was difficult, where did you struggle?
 
-I think I got a hand of it, and now the work is more fluid and becomes easier.  
+I think I got the hang of it: the work now feels more fluid and is becoming easier.
 
 - Was there any good/fun “struggling”/exploration?
   Any show stoppers – anything where you should reach out to peers or instructors?
 
-The monthly query was an interesting surprise: there DuckDB was about 44 times faster, while for the dashboard it was "only" about 13 times faster. 
+The monthly query was an interesting surprise: there DuckDB was about 44 times faster, while for the dashboard it was "only" about 13 times faster, the opposite of the example in the module. I think the reason is that the dashboard filters by one day, so SQLite can throw most rows away early, while the monthly report has to group every one of the 2,000,000 rows.
 
 - How was your interaction with peers/instructors?
 
-It was pretty individual; we worked on our laptops and exchanged some advice, but not more than that. 
+It was pretty individual; we worked on our laptops and exchanged some advice, but not more than that.
+
+- Who did you help, gave feedback to?
+
+Nobody in particular this time; we only exchanged some advice while everyone worked on their own laptop. 
 

@@ -4,14 +4,18 @@
 
 This was my very first contact with databases, and in a way it was also my first contact with this way of studying. Before I could write a single query I had to understand how the class works, build my own portfolio on GitHub and set up a toolchain on my laptop. Only at the end of the session did I load real data into a database and ask it questions. Below I go through the learning goals one by one and explain, in my own words, what I understood and what I did to reach each of them.
 
+## My personal profile and expectations
+
+My name is Rayan Slassi, and I study Industrial Engineering (Bachelor) at HSBI in Bielefeld; the winter semester 2026/27 is my third semester. Before this course I had never worked with a database, and working with GitHub in this way was also new to me. As a future industrial engineer I expect to work a lot with data from machines, production and maintenance, so I want to leave this course able to design a small database, ask it the right questions, and judge whether an answer, my own or an LLM's, can really be trusted. I also want to become comfortable with GitHub and with explaining technical work clearly in English.
+
 ## Learning goals
 
-1. Explain how this class works — the CBL/PBL philosophy, the portfolio-based project work assessment, and the "moving bar" of a first-time course.
-2. Set up your personal GitHub portfolio from the course template, with a clean first commit and a `.gitignore` that keeps databases and secrets out of Git.
-3. Set up the entire toolchain reproducibly with `uv` — one fixed Python plus SQLite, DuckDB, Datasette, and more — on Windows, macOS, or Linux, and verify it.
-4. Explain — with a measurement, not a slide — the difference between an embedded database and a client/server database, and why most local apps should not run a server.
-5. Load real rows into SQLite and query them from Python using bound parameters.
-6. Take a first LLM-generated query, run it, and begin the habit that defines this course: verify before you trust.
+1. Explain how this class works — the CBL/PBL philosophy, the portfolio-based project work assessment, and the "moving bar" of a first-time course. [evidence 1](#1-how-this-class-works)
+2. Set up your personal GitHub portfolio from the course template, with a clean first commit and a `.gitignore` that keeps databases and secrets out of Git. [evidence 2](#2-my-github-portfolio-and-the-gitignore)
+3. Set up the entire toolchain reproducibly with `uv` — one fixed Python plus SQLite, DuckDB, Datasette, and more — on Windows, macOS, or Linux, and verify it. [evidence 3](#3-a-reproducible-toolchain-with-uv)
+4. Explain — with a measurement, not a slide — the difference between an embedded database and a client/server database, and why most local apps should not run a server. [evidence 4](#4-embedded-vs-clientserver--with-a-measurement)
+5. Load real rows into SQLite and query them from Python using bound parameters. [evidence 5](#5-real-rows-into-sqlite-with-bound-parameters)
+6. Take a first LLM-generated query, run it, and begin the habit that defines this course: verify before you trust. [evidence 6](#6-my-first-llm-generated-query-verify-before-you-trust)
 
 ---
 
@@ -39,7 +43,7 @@ I learned this the honest way, by making the mistake first: I pushed `tour.db` a
 
 What I did: I installed `uv` (and solved a PATH problem simply by restarting the terminal), then I ran `uv init`, `uv python install 3.14`, `uv python pin 3.14` and `uv add duckdb datasette sqlite-utils pydantic sqlalchemy`. I installed the `sqlite3` shell with `winget install SQLite.SQLite`, and `litecli`, `datasette` and `sqlite-utils` as global tools. Finally I wrote [`uv-check.py`](../uv-check.py) and ran it with `uv run uv-check.py` to confirm that everything was installed; the result is in [`uv-check-output.txt`](../uv-check-output.txt), and my project settings are in [`pyproject.toml`](../pyproject.toml).
 
-[TODO: the saved output currently shows Python 3.13.5 from a `.venv` in my user folder, not 3.14 from the project. Re-run `uv run uv-check.py` inside the project folder and save the new output.]
+Looking at the saved output again later, I noticed something that does not match: it reports Python 3.13.5 from a `.venv` in my user folder (`C:\Users\rayan\.venv`), not from the project. That means I ran the check from the wrong environment. The project itself is pinned to Python 3.14 in [`.python-version`](../.python-version), and that is the version `uv` uses when a command is started inside the project folder. It was a good reminder that "reproducible" only works if you run things from the right place.
 
 Before moving on to Python, I also took a short tour of the `sqlite3` shell ([`shell-tour.txt`](shell-tour.txt), [`tour.sql`](tour.sql), [my notes](shell-tour-notes.txt)). My favourite command was `.schema`, because it prints the exact `CREATE` statement that built a table, which is the fastest way to understand a database you did not design yourself. That turned out to be the main skill of Module 2.
 

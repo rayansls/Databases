@@ -60,6 +60,14 @@ Query:
 Result: `RANDOM-NAME|unknown`
 Production impact: `installed` is free TEXT. Row `RANDOM-NAME` has `'unknown'`. Any date filter silently drops or breaks on this row; age/warranty calculations fail.
 
+## Defect 5 — Joining on the comma-separated list
+Query:
+    SELECT j.job_id, j.parts_used, p.part_no
+    FROM maint_job j JOIN part p ON p.part_no = j.parts_used
+    ORDER BY j.job_id;
+Result: `2|P-1003|P-1003`, `2|P-1003|P-1003`, `3|P-1001|P-1001`
+Production impact: the JOIN does not crash, it just returns the wrong rows. Job 1 (`'P-1001,P-1002'`) disappears, because the whole list is compared with one part number; job 4 (no parts) disappears too; and job 2 appears twice, because `P-1003` is duplicated (Defect 2). Any report of "parts used per job" is silently wrong.
+
 ## Cardinality proof
 Query:
     SELECT job_id, parts_used,

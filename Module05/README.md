@@ -2,17 +2,17 @@
 
 [← Module 4](../module04/README.md) · [Back to my portfolio](../README.md) · [Reflection 5](../Reflections/ref05.md) · [Next: Module 6a →](../Module06a/README.md)
 
-In Module 4 I made each row correct. In this module the question was about the shape of the whole database. The story: Kortmann's machine-health dashboard needs 40 seconds to answer, and the operations lead, Yasmin Kaya, suggests a shortcut — copy the site and the technician onto every job row, so the dashboard reads just one table. She is right that reading becomes faster, but copying the same fact into many places has a price. My task was to do both things, keep the schema correct *and* add a fast reporting table on purpose, and then measure what each choice costs, so the decision is made with numbers and not with opinions.
+In Module 4 I made each row correct. In this module the question was about the shape of the whole database. The story: Kortmann's machine-health dashboard needs 40 seconds to answer, and the operations lead, Yasmin Kaya, suggests a shortcut — copy the site and the technician onto every job row, so the dashboard reads just one table. Her idea is that reading becomes faster, but copying the same fact into many places has a price, and as it turned out, the speed-up was not even guaranteed. My task was to do both things, keep the schema correct *and* add a fast reporting table on purpose, and then measure what each choice costs, so the decision is made with numbers and not with opinions.
 
-> **Note on teamwork:** during class I worked with my new pod, and we did tasks 1 (functional dependencies), 2 (the anomalies) and 4 (the race) together; that part of the work is in my teammates' portfolios: [TODO: add the links to my teammates' Module 5 folders]. Below I explain the whole module in my own words, with the evidence that is in my folder.
+> **Note on teamwork:** my usual pod was not there, so I worked with a new pod: [Isa Babayev](https://github.com/isa-babayev-ibabayev/databases-portfolio), [Arshia Ziaee](https://github.com/Arshia-zi) and [Asmin Metin](https://github.com/asminmetin/databases-portfolio). We did the first two rounds (the functional dependencies and the anomalies) together: Isa wrote down the dependencies, Asmin and Arshia drew the two ER sketches, and I asked an LLM for its list of dependencies and compared it with ours. I then built the tables and the race, which are in this folder, and Isa ran the full "price it" round; I use Isa's numbers below where mine are missing, and I always say so. Below I explain the whole module in my own words.
 
 ## Learning goals
 
-1. Derive **functional dependencies** from a relation and identify candidate keys.
-2. Normalize a relation to **1NF, 2NF, and 3NF**, explaining the anomaly each step removes.
-3. **Denormalize deliberately** to speed up a hot read path, and predict what it costs on writes and storage.
-4. **Measure** the trade-off: query latency, write cost, and database size — before and after.
-5. Decide, and *defend*, where a schema should sit on the normalization spectrum for a given workload.
+1. Derive **functional dependencies** from a relation and identify candidate keys. [evidence 1](#1-functional-dependencies-and-the-candidate-key)
+2. Normalize a relation to **1NF, 2NF, and 3NF**, explaining the anomaly each step removes. [evidence 2](#2-from-the-flat-table-to-3nf-and-the-anomalies-it-removes)
+3. **Denormalize deliberately** to speed up a hot read path, and predict what it costs on writes and storage. [evidence 3](#3-denormalizing-on-purpose)
+4. **Measure** the trade-off: query latency, write cost, and database size — before and after. [evidence 4](#4-measuring-the-trade-off)
+5. Decide, and *defend*, where a schema should sit on the normalization spectrum for a given workload. [evidence 5](#5-deciding-and-defending)
 
 ---
 
@@ -57,7 +57,15 @@ Then I did what Yasmin asked, but deliberately and next to the clean tables, not
 
 **Reading.** The query plans ([`explain_plan.txt`](explain_plan.txt), [`explain_plans.txt`](explain_plans.txt)) show the difference clearly: the normalized dashboard ([`benchmark.sql`](benchmark.sql)) scans `job_part` and then jumps to the three other tables through their keys, while the report version is a single scan of `report_jobpart`. I also tried the module's experiment of dropping the index: with it the plan was `SCAN report_jobpart USING INDEX ix_report_machine`, and without it a plain `SCAN report_jobpart`.
 
-[TODO: add the dashboard query time for both designs, from the race we did in class.]
+The times are where the surprise came. My own race only saved the plans and the results, not the times, so here I use the medians of seven runs from Isa's "price it" round, which measured all three versions on the same machine:
+
+| Dashboard on… | Median time |
+|---|---:|
+| the four normalized tables (3NF) | 133.2 ms |
+| `report_jobpart` with the index `ix_report_machine` | 162.7 ms |
+| `report_jobpart` after dropping the index | 108.3 ms |
+
+With its index, the denormalized table was actually **slower** than the normalized design, the opposite of what we expected. The reason is the same lesson as in [Module 3](../Module03/README.md#3-benchmarking-an-index-and-when-it-does-not-help): the dashboard reads the whole table anyway, so walking through it via the index only adds thousands of extra jumps. Only after dropping the index did the report table become faster, and even then only by about 25 ms.
 
 **Writing and storage.** This is where the price shows ([`price_it.sql`](price_it.sql), [`price_it_results.txt`](price_it_results.txt)):
 
@@ -66,13 +74,17 @@ Then I did what Yasmin asked, but deliberately and next to the clean tables, not
 | Normalized (3NF, 4 tables) | 1 | ~0.6 ms | ~4.1 MB |
 | Denormalized (`report_jobpart`) | 4,000 | ~25 ms | ~11.1 MB |
 
-The number I find most important is not the milliseconds but the rows touched: **1 against 4,000**. That is exactly the update anomaly from the "break it" round, now with a price tag, and it grows with every job the plant records. On top of that, the report table needs almost three times the storage for the same information.
+The number I find most important is not the milliseconds but the rows touched: **1 against 4,000**. That is exactly the update anomaly from the "break it" round, now with a price tag, and it grows with every job the plant records. On top of that, the report table needs almost three times the storage for the same information. Isa's run showed the same picture: 1 row against 4,000 rows, and 0.85 ms against 13.9 ms for the update.
 
 ## 5. Deciding and defending
 
-For this plant I would keep the operational tables, where jobs and parts are written every day, in 3NF, because there every fact must be stored once and every update must touch one row. The denormalized `report_jobpart` is worth having only as a *read-only copy* for the dashboard, and only if it is clear from the start how it stays fresh, for example by rebuilding it on a schedule or by keeping it in sync with a trigger like the ones from [Module 4](../module04/README.md); otherwise the dashboard will one day show a machine at the wrong site, and nobody will notice.
+Putting the numbers side by side made the decision much easier than I expected. The shortcut promised faster reading, but in our measurement it saved at most about 25 ms per dashboard (and only without its index), while every change to a machine became 4,000 row updates instead of one and the data took almost three times the space. So I wrote this short memo to the operations lead:
 
-[TODO: write this as the short memo to the operations lead, with my own numbers, as the module asks.]
+> **To:** Yasmin Kaya · **From:** Rayan Slassi · **Re:** Copying site and technician onto every job row
+>
+> Keep jobs, machines and parts in 3NF: there every fact is stored once, so moving a machine changes 1 row instead of 4,000, and the data needs about 4 MB instead of about 11 MB. On our 200,000 rows the copied table did not make the dashboard clearly faster: 133 ms on the normalized tables, 163 ms on the copy with its index, and 108 ms on the copy without it. If we still want the copy for the dashboard, it must be read-only, without the `machine_id` index, and rebuilt from the 3NF tables on a schedule, so that it can never show a machine at the wrong site for longer than one rebuild. For the really slow reports, the answer is probably not more copies inside SQLite, but a different engine for big reads.
+
+The last sentence of the memo is where I went next.
 
 ---
 
@@ -84,4 +96,4 @@ For this plant I would keep the operational tables, where jobs and parts are wri
 
 What I took away from this module is in [Reflection 5](../Reflections/ref05.md).
 
-**Where this leads:** the reporting table made reading faster, but it is still SQLite, an engine built to read and write single rows. In [Module 6a](../Module06a/README.md) I move a much bigger version of this same report, 2,000,000 rows, into an engine designed only for analysis, DuckDB, and race the two.
+**Where this leads:** the reporting table hardly made reading faster, and it is still SQLite, an engine built to read and write single rows. In [Module 6a](../Module06a/README.md) I move a much bigger version of this same report, 2,000,000 rows, into an engine designed only for analysis, DuckDB, and race the two.

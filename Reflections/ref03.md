@@ -1,7 +1,5 @@
 # Reflection 3 — Module 3: LLM-Assisted SQL & Query Profiling
 
-<!-- DRAFT written from my Module 3 notes (sql-notes.md, bench_output.txt). Check every sentence and fill in the [TODO] parts before the checkpoint. -->
-
 [← Reflection 2](ref02.md) · [Module 3 README](../Module03/README.md) · [Next: Reflection 4 →](ref04.md)
 
 - What is your take-away, what do you want to remember, what would be your advice?
@@ -23,7 +21,7 @@ The prediction table in the plan safari was good, because it made me commit to a
 
 - What was difficult, where did you struggle?
 
-The hardest part was understanding the negative result: why an index that the LLM recommended, and that the planner actually used, made the dashboard slower instead of faster. I had to think about how many rows the filter keeps before it made sense. [TODO: add anything else that was hard for you, for example setup problems or the relational algebra notation.]
+The hardest part was understanding the negative result: why an index that the LLM recommended, and that the planner actually used, made the dashboard slower instead of faster. I had to think about how many rows the filter keeps before it made sense. The relational algebra notation was also new for me: the symbols σ, π and ⋈ looked strange at first, until I understood that they are just another way of writing WHERE, SELECT and JOIN.
 
 - Was there any good/fun “struggling”/exploration?
   Any show stoppers – anything where you should reach out to peers or instructors?
@@ -32,8 +30,8 @@ The stretcher with the late orders was a fun exploration: the correlated subquer
 
 - How was your interaction with peers/instructors?
 
-[TODO: describe how you worked with your pod and with the other pod in Task C, and whether anyone answered your questions in #sql-questions.]
+Each of us ran the queries on our own laptop, but we used the pod to share the study questions: I asked an LLM how relational algebra, covering indexes and the order of the SQL clauses work, and then checked every answer by running it, so that I could explain it to the others in one sentence (for example "σ filters rows, π keeps columns, ⋈ glues tables"). The two curiosities I could not solve myself I posted in `#sql-questions`.
 
 - Who did you help, gave feedback to?
 
-[TODO]
+I helped Jonathan a bit.
