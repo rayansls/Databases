@@ -6,7 +6,7 @@ In Module 5 I built a reporting table to make the dashboard faster, but it was s
 
 ## Learning goals
 
-1. Move a table out of SQLite into **Parquet** reproducibly, from a script.
+1. Move a table out of SQLite into **Parquet** reproducibly, from a script. [evidence 1](#1-from-sqlite-to-parquet-with-a-script)
 2. Run the **same aggregate** in SQLite and DuckDB and report the difference honestly (interleaved runs, median).
 3. Read **`EXPLAIN ANALYZE`** and name the operator and row count that dominate.
 4. State, with a number, **where DuckDB is the wrong engine**.
