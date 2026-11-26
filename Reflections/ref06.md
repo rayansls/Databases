@@ -19,17 +19,14 @@ The `EXPLAIN ANALYZE` output was good because it showed me why DuckDB is fast: i
 
 - What was difficult, where did you struggle?
 
-[TODO: what was hard for you? For example, the boundary test, or saving the outputs on Windows (my plan-results.txt came out with broken box characters).]
+I think I got a hand of it, and now the work is more fluid and becomes easier.  
 
 - Was there any good/fun “struggling”/exploration?
   Any show stoppers – anything where you should reach out to peers or instructors?
 
-The monthly query was an interesting surprise: there DuckDB was about 44 times faster, while for the dashboard it was "only" about 13 times faster. [TODO: write in your own words why you think the two ratios are so different.]
+The monthly query was an interesting surprise: there DuckDB was about 44 times faster, while for the dashboard it was "only" about 13 times faster. 
 
 - How was your interaction with peers/instructors?
 
-[TODO]
+It was pretty individual; we worked on our laptops and exchanged some advice, but not more than that. 
 
-- Who did you help, gave feedback to?
-
-I helped Jonathan a bit.
