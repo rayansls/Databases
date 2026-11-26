@@ -25,13 +25,11 @@ Two moments taught me the most:
 
 I also learned to always check the schema after creating a table: a copy-paste error had corrupted my `CHECK` line, and the table still *looked* fine until I read it back with `.schema`.
 
-[TODO: add the setup script with the `STRICT` table and the exact error message of each rejected statement (NOT NULL, UNIQUE, CHECK, FOREIGN KEY, STRICT type) to this folder.]
 
 ## 2. Generated columns
 
 A generated column is a column whose value the database calculates by itself from other columns, for example a temperature in Fahrenheit computed from the Celsius value, so that no application can ever store a wrong or outdated version of it.
 
-[TODO: describe the generated column from my setup script and show one row where the database filled it in by itself.]
 
 ## 3. Triggers for alarms and audit
 
@@ -44,7 +42,7 @@ In the stretcher I also tried a `BEFORE INSERT` trigger with `RAISE(ABORT)`: ins
 
 Finally I measured whether triggers make inserts slow, with [`benchmark.py`](benchmark.py), which inserts 10,000 rows with and without the alarm trigger. The trigger only added a few hundredths of a second, which changed how I think about them: a trigger is not automatically "slow", it depends on what it does, although on a very busy ingestion path even a small extra cost is a design decision.
 
-[TODO: write the two exact times from `benchmark.py` here and in `integrity-notes.md`.]
+
 
 ## 4. UPSERT: ingesting the same data twice without duplicates
 
@@ -58,7 +56,6 @@ A server database like PostgreSQL manages access centrally, with users and roles
 
 My conclusion is that file permissions are perfectly fine at the edge, because it is a single box, physically secured, with one user, so the operating system is the only boundary needed. They are not acceptable for a web app with many customers, because one SQLite file cannot tell customer A from customer B: everyone with access to the file sees everything. That situation needs a server with separate roles and row-level security.
 
-[TODO: add the access-control demonstration (`mode=ro`, `chmod`, a view) with its output.]
 
 ---
 
