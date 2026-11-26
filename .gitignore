@@ -7,3 +7,4 @@
 .env
 __pycache__/
 module-01/telemetry.csv
+Module06b/sessions*

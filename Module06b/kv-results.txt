@@ -1,0 +1,9 @@
+Output of kv_compare.py on my laptop (Windows, project .venv, started from VS Code):
+
+shelve  set=  14.290s get=   0.218s
+sqlite  set=   0.059s get=   1.675s
+-- a query across sessions (only possible in SQLite):
+('filter=city:0', 5000)
+('filter=city:1', 5000)
+('filter=city:2', 5000)
+('filter=city:3', 5000)

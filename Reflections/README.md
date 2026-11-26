@@ -14,7 +14,7 @@ They will be named ref01.md to refnn.md
 | [Reflection 4](ref04.md) | [Module 4 — Data Integrity, Constraints & Edge Triggers](../module04/README.md) |
 | [Reflection 5](ref05.md) | [Module 5 — Normalization vs. Denormalization](../Module05/README.md) |
 | [Reflection 6](ref06.md) | [Module 6a — The Analytical Engine (DuckDB)](../Module06a/README.md) |
-| [Reflection 7](ref07.md) | Module 6b — Polyglot Persistence & the Decision |
+| [Reflection 7](ref07.md) | [Module 6b — Polyglot Persistence & the Decision](../Module06b/README.md) |
 
 As a reminder, we expect the following in a reflection:
 

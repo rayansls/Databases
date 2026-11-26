@@ -1,6 +1,6 @@
 # Module 6a — The Analytical Engine (DuckDB)
 
-[← Module 5](../Module05/README.md) · [Back to my portfolio](../README.md) · [Reflection 6](../Reflections/ref06.md)
+[← Module 5](../Module05/README.md) · [Back to my portfolio](../README.md) · [Reflection 6](../Reflections/ref06.md) · [Next: Module 6b →](../Module06b/README.md)
 
 In Module 5 I built a reporting table to make the dashboard faster, but it was still inside SQLite, an engine designed to write and read *single rows* very quickly, like recording one maintenance job or looking up one part. A month-end report is a completely different kind of work: it reads millions of rows and squeezes them into a few totals. In this module I stretched the Module 5 report to ten quarters, 2,000,000 rows, moved it into a format built for analysis, and raced SQLite against DuckDB, an engine that stores data by column instead of by row. The goal was not to find "the best database" but to find out, with numbers, which engine fits which job. My notes are in [`duckdb-notes.md`](duckdb-notes.md).
 
@@ -78,4 +78,4 @@ An analytical copy is only useful if it is fresh. The Parquet file is rebuilt ev
 
 What I took away from this module is in [Reflection 6](../Reflections/ref06.md).
 
-**Where this leads:** this module showed me that one workload can need a different engine than another. Module 6b takes this idea further, comparing JSON, key-value storage and a real database server, and ending with a written decision about which engine to use for each job.
+**Where this leads:** this module showed me that one workload can need a different engine than another. [Module 6b](../Module06b/README.md) takes this idea further, comparing JSON, key-value storage and a real database server, and ending with a written decision about which engine to use for each job.

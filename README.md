@@ -23,7 +23,7 @@ This portfolio follows the course one module at a time. Each module README expla
 | [Module 4: Data Integrity, Constraints & Edge Triggers](module04/README.md) | [Reflection 4](Reflections/ref04.md) |
 | [Module 5: Normalization vs. Denormalization](Module05/README.md) | [Reflection 5](Reflections/ref05.md) |
 | [Module 6a: The Analytical Engine (DuckDB)](Module06a/README.md) | [Reflection 6](Reflections/ref06.md) |
-| Module 6b: Polyglot Persistence & the Decision | [Reflection 7](Reflections/ref07.md) |
+| [Module 6b: Polyglot Persistence & the Decision](Module06b/README.md) | [Reflection 7](Reflections/ref07.md) |
 
 All reflections are also listed [here](Reflections/README.md).
 
