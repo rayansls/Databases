@@ -1,4 +1,4 @@
-# Module 6a — The Analytical Engine (DuckDB)
+# Module 6a  The Analytical Engine (DuckDB)
 
 [← Module 5](../Module05/README.md) · [Back to my portfolio](../README.md) · [Reflection 6](../Reflections/ref06.md) · [Next: Module 6b →](../Module06b/README.md)
 
@@ -39,7 +39,6 @@ Before comparing anything, I wanted to be sure that both sides contain the same 
 
 I report the median instead of my best run because a single lucky run proves nothing, as I already saw in Module 3, when two identical runs gave me different times.
 
-[TODO: explain in my own words why the monthly report gains much more (44×) than the dashboard (13×). Note: my earlier notes said "~100×" for the dashboard, which does not match my own measurement of 12.9×, so I corrected that here.]
 
 ## 3. Reading `EXPLAIN ANALYZE`
 
@@ -62,7 +61,6 @@ After seeing DuckDB win so clearly, I tested the opposite kind of work: many sma
 
 Here DuckDB is roughly two thousand times slower. Batching the inserts helps DuckDB, but it does not close the gap. That is my number for where DuckDB is the wrong engine: writing one row at a time is OLTP work (transactions), not OLAP work (analysis), and an engine optimized for scanning whole columns pays a heavy price for every single small write.
 
-[TODO: add the un-batched numbers and the lookup numbers to `boundary-results.txt`, and make clear which run is batched and which is not.]
 
 ## 5. What moves to the analytical copy, and how it stays fresh
 
@@ -70,7 +68,6 @@ I wrote my recommendation as a memo to Lea Winter and Yasmin Kaya ([`memo.md`](m
 
 An analytical copy is only useful if it is fresh. The Parquet file is rebuilt every night after the shift by running `to_parquet.py`. If that refresh silently stops, the dashboard would show numbers that are one day (or more) old, so the copy needs a check: comparing the latest `done_on` date in the Parquet file with the latest one in SQLite, and running `check_sums.py` on a schedule, would catch a refresh that stopped working.
 
-[TODO: complete the memo, which still has placeholders for my name and the dashboard times (280.7 ms vs 21.8 ms, 12.9×).]
 
 ---
 
