@@ -26,7 +26,6 @@ Before comparing anything, I wanted to be sure that both sides contain the same 
 | `SUM(part_price)` | 21,000,000.0 | 21,000,000.0 |
 | Result | **MATCH** | |
 
-[TODO: add the size of `history.db` next to the 2.4 MB of the Parquet file.]
 
 ## 2. The race, reported honestly
 
