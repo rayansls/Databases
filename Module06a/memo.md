@@ -1,7 +1,7 @@
 # Memo — Analytical copy of the month-end report
 
 **To:** Lea Winter, Yasmin Kaya
-**From:** [Your Name]
+**From:** Rayan Slassi
 **Date:** November 12, 2026
 **Re:** Moving the month-end report off the operational database
 
